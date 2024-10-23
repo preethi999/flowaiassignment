@@ -1,0 +1,10 @@
+app.put('/transactions/:id', (req, res) => {
+    const { id } = req.params;
+    const { type, category, amount, date, description } = req.body;
+    const sql = `UPDATE transactions SET type = ?, category = ?, amount = ?, date = ?, description = ? 
+                 WHERE id = ?`;
+    db.run(sql, [type, category, amount, date, description, id], function (err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ id, type, category, amount, date, description });
+    });
+});

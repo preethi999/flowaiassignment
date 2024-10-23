@@ -1,0 +1,7 @@
+app.get('/transactions', (req, res) => {
+    const sql = `SELECT * FROM transactions`;
+    db.all(sql, [], (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(rows);
+    });
+});

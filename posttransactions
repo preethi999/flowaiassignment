@@ -1,0 +1,9 @@
+app.post('/transactions', (req, res) => {
+    const { type, category, amount, date, description } = req.body;
+    const sql = `INSERT INTO transactions (type, category, amount, date, description) 
+                 VALUES (?, ?, ?, ?, ?)`;
+    db.run(sql, [type, category, amount, date, description], function (err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ id: this.lastID, type, category, amount, date, description });
+    });
+});

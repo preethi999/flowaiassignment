@@ -1,0 +1,47 @@
+app.get('/summary', (req, res) => {
+    const { startDate, endDate, category } = req.query;
+    
+    let sql = `SELECT type, SUM(amount) as total 
+               FROM transactions WHERE 1=1`;
+
+    let params = [];
+    
+    if (startDate) {
+        sql += ` AND date >= ?`;
+        params.push(startDate);
+    }
+
+    if (endDate) {
+        sql += ` AND date <= ?`;
+        params.push(endDate);
+    }
+
+    if (category) {
+        sql += ` AND category = ?`;
+        params.push(category);
+    }
+
+    sql += ` GROUP BY type`;
+
+    db.all(sql, params, (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+
+        const summary = {
+            totalIncome: 0,
+            totalExpenses: 0,
+            balance: 0,
+        };
+
+        rows.forEach(row => {
+            if (row.type === 'income') {
+                summary.totalIncome = row.total;
+            } else if (row.type === 'expense') {
+                summary.totalExpenses = row.total;
+            }
+        });
+
+        summary.balance = summary.totalIncome - summary.totalExpenses;
+
+        res.json(summary);
+    });
+});
